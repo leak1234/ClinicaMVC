@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Consultas{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h4 class="fw-bold mb-0"><i class="bi bi-clipboard2-pulse-fill text-primary me-2"></i>Consultas</h4>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('consulta.exportar') }}" class="btn btn-success btn-sm">
+            <i class="bi bi-file-earmark-csv me-1"></i>Exportar CSV
+        </a>
+        <a href="{{ url_for('consulta.create') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i>Nueva Consulta
+        </a>
+    </div>
+</div>
+
+<!-- Filtro por fecha (extra) -->
+<div class="card mb-3 p-3">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">Desde</label>
+            <input type="date" name="fecha_inicio" class="form-control form-control-sm" value="{{ fecha_inicio or '' }}">
+        </div>
+        <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">Hasta</label>
+            <input type="date" name="fecha_fin" class="form-control form-control-sm" value="{{ fecha_fin or '' }}">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-primary btn-sm"><i class="bi bi-funnel me-1"></i>Filtrar</button>
+            <a href="{{ url_for('consulta.index') }}" class="btn btn-outline-secondary btn-sm">Limpiar</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th>#</th><th>Fecha</th><th>Paciente</th><th>Médico</th><th>Especialidad</th><th>Diagnóstico</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+            {% for c in consultas %}
+            <tr>
+                <td>{{ c.id }}</td>
+                <td>{{ c.fecha.strftime('%d/%m/%Y') }}</td>
+                <td>{{ c.paciente.nombre }}</td>
+                <td>{{ c.medico.nombre }}</td>
+                <td><span class="badge bg-info text-dark">{{ c.medico.especialidad }}</span></td>
+                <td>{{ c.diagnostico[:50] }}{% if c.diagnostico|length > 50 %}…{% endif %}</td>
+                <td>
+                    <a href="{{ url_for('consulta.edit', id=c.id) }}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a>
+                    <a href="{{ url_for('consulta.delete', id=c.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar consulta?')"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center text-muted py-4">No hay consultas registradas.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
